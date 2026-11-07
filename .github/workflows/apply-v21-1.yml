@@ -1,0 +1,86 @@
+name: Apply Universe Studio v21.1 iPhone update
+on:
+  push:
+    paths:
+      - .github/workflows/apply-v21-1.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Integrate iPhone changes into index.html
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          if 'iphone-v21.1.css' in s and 'cleanStarter=true' in s:
+              print('v21.1 already applied')
+              raise SystemExit(0)
+          if not s.startswith('<!DOCTYPE html>') or 'async function newUniverse(){' not in s: raise RuntimeError('Unexpected source')
+          def patch(old,new):
+              global s
+              if s.count(old)!=1: raise RuntimeError('Unexpected patch target: '+old[:80])
+              s=s.replace(old,new,1)
+          patch('Universe Studio v21</title>','Universe Studio v21.1</title>')
+          s=s.replace('</head>','<link rel="stylesheet" href="./iphone-v21.1.css">\n</head>',1)
+          end=s.rfind('</body>')
+          if end<0: raise RuntimeError('Missing body close')
+          s=s[:end]+'<script src="./iphone-v21.1.js" defer></script>\n'+s[end:]
+          patch('const homeState={exportsReady:false,hasConfirmedNew:false};','const homeState={exportsReady:false,hasConfirmedNew:false,newMode:"keep"};')
+          a=s.index('function options(){');b=s.index('function downloadBackup()',a)
+          opts=s[a:b]
+          if b-a>2000 or '<div class="buttonrow">' not in opts: raise RuntimeError('Unexpected reset options')
+          dollar=chr(36)
+          choices='<div class="us21-new-mode" style="display:grid;gap:10px;margin:13px 0"><label style="display:flex;gap:9px;align-items:start"><input type="radio" name="us21-new-mode" value="keep" '+dollar+"{homeState.newMode==='keep'?'checked':''}"+'><span><b>Clear bookings, keep roster</b><br>Retain wrestlers, teams, champions and brand presentation. Reset shows, PLEs, storylines, results, rankings and reigns.</span></label><label style="display:flex;gap:9px;align-items:start"><input type="radio" name="us21-new-mode" value="blank" '+dollar+"{homeState.newMode==='blank'?'checked':''}"+'><span><b>Completely blank Universe</b><br>Also remove rosters, teams, champions and saved show logos.</span></label></div>'
+          s=s[:a]+opts.replace('<div class="buttonrow">',choices+'<div class="buttonrow">',1)+s[b:]
+          patch("document.addEventListener('change',e=>{const t=e.target;if(t.dataset.us25Theme){","document.addEventListener('change',e=>{const t=e.target;if(t.name==='us21-new-mode'){homeState.newMode=t.value;return;}if(t.dataset.us25Theme){")
+          a=s.index('async function newUniverse(){');b=s.index('// Single delegated handler',a)
+          reset=s[a:b]
+          if b-a>3800 or '  db=fresh;anchor=' not in reset: raise RuntimeError('Unexpected reset function')
+          reset=reset.replace('  const fresh=clone(V9_USER_STARTER);fresh.schema=3;', "  const fresh=clone(V9_USER_STARTER);fresh.schema=3;const resetMode=homeState.newMode==='blank'?'blank':'keep';",1)
+          clean="""  fresh.cleanStarter=true;fresh.legacyReigns={};fresh.historicalTeams={};fresh.pleLogos={};
+            for(const k of ['reviewFlags','turnHistory','statusHistory','draftHistory','relationships','v7Decisions','v7Notifications','ledgerImportConflicts','v8ReignSeen','v8ReviewFlags','v9DecisionHistory','v9Checkpoints','foundrySuggestions','foundryReviews','v15ShowHistory'])fresh[k]=[];
+            for(const k of ['v7LibrarySources','v9Spotlights','availabilityDetails','wear','statuses'])fresh[k]={};
+            fresh.draftWeek={start:fresh.calendarBase,active:false};fresh.v8ReignBaseline=fresh.calendarBase;
+            fresh.v7Imported=true;fresh.ledgerCsvEdition='corrected-2026-10-15';fresh.exportInfo={};delete fresh.exportedAt;
+            if(resetMode==='keep'){
+             for(const k of ['rosters','teams','factions','champions','contracts','showNames','weekdays','championshipMeta','showAppearance','settings','rosterNotes','alignments','divisions'])if(saved[k]!==undefined)fresh[k]=clone(saved[k]);
+            }else{
+             for(const b of BRANDS)fresh.showAppearance[b]={primary:fresh.showAppearance?.[b]?.primary||'#b8895b',secondary:'#19212c',logo:''};
+             for(const b of Object.keys(fresh.contracts||{}))for(const key of Object.keys(fresh.contracts[b]||{}))fresh.contracts[b][key]='Vacant';
+            }
+            fresh.statuses={};fresh.wear={};fresh.availabilityDetails={};
+            for(const b of BRANDS){fresh.statuses[b]={};fresh.wear[b]={};fresh.availabilityDetails[b]={};
+             for(const t of Object.keys(fresh.championshipDivisions?.[b]||{})){const d=fresh.championshipDivisions[b][t];if(d&&typeof d==='object'){d.members=[];d.ranking=[];d.notes='';}}
+            }
+            fresh.settings||={};delete fresh.settings.defaultMonth;fresh.settings.plannedCycles=[];
+            fresh.v16Migration={version:16,cleanStarter:true};
+          """
+          reset=reset.replace('  db=fresh;anchor=',clean+'  db=fresh;anchor=',1)
+          reset=reset.replace('applyUniverseTheme();persist();hideHome();','applyUniverseTheme();persist();await window.__US20_FLUSH?.();if(window.__US20_STATE?.lastError)throw Error(window.__US20_STATE.lastError);hideHome();',1)
+          reset=reset.replace("toast('Fresh Universe created. Set up your promotions and roster.');","toast(resetMode==='keep'?'Fresh booking history created; roster retained.':'Blank Universe created. Set up your promotions and roster.');",1)
+          reset=reset.replace("}catch(err){db=saved;toast('New Universe cancelled: '+err.message);}}", "}catch(err){db=saved;persist();toast('New Universe cancelled: '+err.message);}}",1)
+          s=s[:a]+reset+s[b:]
+          patch('function v7Ensure(){','function v7Ensure(){if(db.cleanStarter){db.legacyReigns||={};db.v7Imported=true;return;}')
+          patch('function v8UpgradeHistory(){','function v8UpgradeHistory(){if(db.cleanStarter)return false;')
+          if not all(x in s for x in ('iphone-v21.1.css','iphone-v21.1.js','cleanStarter=true','us21-new-mode')): raise RuntimeError('Patch incomplete')
+          p.write_text(s,encoding='utf-8')
+          print('v21.1 integrated',len(s))
+          PY
+      - name: Commit integrated v21.1
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Integrate iPhone-specific v21.1 layout and protected reset"
+            git push origin HEAD:main
+          fi
