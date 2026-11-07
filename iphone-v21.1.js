@@ -162,3 +162,96 @@
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
  media.addEventListener?.('change',repairNav);
 })();
+
+
+/* v21.7 — Touch-first booking header and an accessible mobile Rivalries drawer.
+   Reuses the original v19.4 tray and event handlers; no edits to saved data. */
+(function(){
+ 'use strict';
+ const mobile=window.matchMedia('(max-width:860px) and (pointer:coarse)');
+ let pending=false;
+ function mount(){
+  if(!mobile.matches)return;
+  const modal=document.getElementById('modalContent');
+  if(!modal||!modal.isConnected)return;
+  const head=modal.querySelector(':scope > .modalhead');
+  if(!head)return;
+  const row=head.querySelector('.buttonrow');
+  const customise=head.querySelector('[data-v10="open-wizard"]');
+  if(customise){
+   if(row&&customise.parentElement!==row)row.prepend(customise);
+   customise.classList.add('us-mobile-customise');
+   customise.hidden=false;
+   customise.setAttribute('aria-label','Customise match card');
+  }
+  const tray=modal.querySelector(':scope > .v192-tray.v194-docked');
+  let trigger=head.querySelector('#us-mobile-rivalries');
+  if(!tray){
+   trigger?.remove();
+   return;
+  }
+  if(!trigger){
+   trigger=document.createElement('button');
+   trigger.type='button';
+   trigger.id='us-mobile-rivalries';
+   trigger.className='us-mobile-rivalries-button';
+   trigger.textContent='▤ Rivalries';
+   trigger.setAttribute('aria-controls','us-mobile-rivalries-panel');
+   (row||head).append(trigger);
+   trigger.addEventListener('click',()=>{
+    const t=document.querySelector('#modalContent > .v192-tray.v194-docked');
+    t?.querySelector('[data-v194-tray-toggle]')?.click();
+    requestAnimationFrame(update);
+   });
+  }
+  tray.id='us-mobile-rivalries-panel';
+  let close=tray.querySelector(':scope > .us-mobile-rivalries-close');
+  if(!close){
+   close=document.createElement('button');
+   close.type='button';
+   close.className='us-mobile-rivalries-close';
+   close.textContent='✕  Close rivalries';
+   close.addEventListener('click',()=>{
+    const t=document.querySelector('#modalContent > .v192-tray.v194-docked');
+    if(t&&!t.classList.contains('v192-tray-collapsed'))
+     t.querySelector('[data-v194-tray-toggle]')?.click();
+    requestAnimationFrame(update);
+   });
+   tray.prepend(close);
+  }
+  update();
+ }
+ function update(){
+  const modal=document.getElementById('modalContent');
+  const tray=modal?.querySelector(':scope > .v192-tray.v194-docked');
+  const trigger=modal?.querySelector('#us-mobile-rivalries');
+  if(!tray||!trigger)return;
+  const open=!tray.classList.contains('v192-tray-collapsed');
+  trigger.setAttribute('aria-expanded',String(open));
+  trigger.textContent=open?'▤ Rivalries — open':'▤ Rivalries';
+  tray.setAttribute('role','region');
+  tray.setAttribute('aria-label','Rivalry plans');
+ }
+ function queue(){
+  if(pending)return;pending=true;
+  requestAnimationFrame(()=>{pending=false;mount();});
+ }
+ const obs=new MutationObserver(mutations=>{
+  if(!mobile.matches)return;
+  if(mutations.some(m=>m.type==='childList'&&
+    Array.from(m.addedNodes).some(n=>n.nodeType===1&&
+      !n.matches?.('.us-mobile-rivalries-button,.us-mobile-rivalries-close')&&
+      !n.closest?.('#us-mobile-rivalries-panel') )))queue();
+ });
+ const boot=()=>{
+  const back=document.getElementById('modalBack');
+  if(back)obs.observe(back,{childList:true,subtree:true});
+  document.addEventListener('click',e=>{
+   if(mobile.matches&&e.target.closest('[data-v194-tray-toggle]'))
+    requestAnimationFrame(update);
+  });
+  queue();
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+ mobile.addEventListener?.('change',queue);
+})();
