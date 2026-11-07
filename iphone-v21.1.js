@@ -3,6 +3,10 @@
  'use strict';
  const media=window.matchMedia('(max-width: 860px) and (pointer: coarse)');
  const root=document.documentElement;
+ // Correct iOS standalone viewport metrics without affecting desktop.
+ const viewport=document.querySelector('meta[name="viewport"]');
+ if(viewport){let value=viewport.getAttribute('content')||'width=device-width, initial-scale=1';if(!/viewport-fit\s*=/.test(value))viewport.setAttribute('content',value+', viewport-fit=cover');}
+ else {const meta=document.createElement('meta');meta.name='viewport';meta.content='width=device-width, initial-scale=1, viewport-fit=cover';document.head.append(meta);}
  let wired=false;
  function active(){return media.matches;}
  function setOpen(open){
@@ -23,6 +27,8 @@
    btn=document.createElement('button');btn.id='us-iphone-toggle';btn.className='ghost';btn.type='button';btn.setAttribute('aria-controls','nav');sidebar.prepend(btn);
   }
   if(!wired){
+   // Keep the content out of the keyboard/menu focus path while the tray is expanded.
+   document.addEventListener('click',e=>{if(active()&&e.target.closest('.main')&&document.querySelector('.shell.us-iphone-open'))setOpen(false)});
    btn.addEventListener('click',()=>setOpen(!document.querySelector('.shell')?.classList.contains('us-iphone-open')));
    document.addEventListener('click',e=>{if(active()&&e.target.closest('.sidebar [data-view],.sidebar [data-us23="home"]'))setOpen(false)});
    document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)});
@@ -32,7 +38,7 @@
  }
  function update(){
   root.classList.toggle('us-iphone',active());
-  if(active())mount();else document.querySelector('.shell')?.classList.remove('us-iphone-open');
+  if(active())mount();else {document.querySelector('.shell')?.classList.remove('us-iphone-open');document.body.classList.remove('us-iphone-tray-open')}
  }
  update();
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',update,{once:true});
