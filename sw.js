@@ -1,5 +1,5 @@
 /* Universe Studio offline app shell. Only static assets are cached, never saves or exports. */
-const VERSION = 'universe-studio-v21-3-pwa-2026-11-07';
+const VERSION = 'universe-studio-v21-4-pwa-2026-11-07';
 const SHELL = ['./', './index.html', './iphone-v21.1.css', './iphone-v21.1.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './icons/favicon-64.png'];
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(VERSION).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
