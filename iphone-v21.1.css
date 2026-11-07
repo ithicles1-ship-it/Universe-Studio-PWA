@@ -59,3 +59,89 @@ html.us-iphone .us21-new-mode input{flex:none;margin-top:4px}
 html.us-iphone .v21-onair-tray{top:auto!important;bottom:calc(6px + env(safe-area-inset-bottom,0px))!important;height:min(62dvh,520px)!important;max-width:92vw!important;transform:translate(calc(100% - 46px),0)!important}
 html.us-iphone .v21-onair-tray.is-open{transform:translate(0,0)!important}
 @media(prefers-reduced-motion:reduce){html.us-iphone .shell,html.us-iphone #us23-home{transition:none!important}}
+
+/* v21.2 Mobile workspace overhaul. Deliberately scoped to touch-width devices. */
+@media (max-width: 860px) and (pointer: coarse) {
+  html.us-iphone,html.us-iphone body{width:100%!important;min-width:0!important;max-width:100%!important;overflow-x:hidden!important}
+  html.us-iphone{font-size:16px!important;overscroll-behavior-x:none}
+  html.us-iphone body{margin:0!important;box-sizing:border-box!important}
+  html.us-iphone *,html.us-iphone *::before,html.us-iphone *::after{box-sizing:border-box}
+  html.us-iphone .shell,html.us-iphone .shell.v10-nav-collapsed{
+    --us-rail:54px!important;
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    grid-template-columns:var(--us-rail) minmax(0,1fr)!important;
+    overflow:clip!important;transition:grid-template-columns .23s ease!important;
+  }
+  html.us-iphone .shell.us-iphone-open{--us-rail:min(76vw,280px)!important}
+  html.us-iphone .shell .sidebar{min-width:0!important;max-width:100%!important;overflow-y:auto!important}
+  html.us-iphone .shell .main{
+    grid-column:2!important;width:auto!important;min-width:0!important;max-width:100%!important;
+    padding:16px 12px calc(100px + env(safe-area-inset-bottom,0px))!important;
+    overflow-x:hidden!important;
+  }
+  /* While navigation is open, preserve the natural page width behind the tray. */
+  html.us-iphone .shell.us-iphone-open .main{
+    width:calc(100vw - 54px)!important;min-width:calc(100vw - 54px)!important;
+    pointer-events:none!important;opacity:.38!important;transition:opacity .2s ease!important
+  }
+  html.us-iphone .sidebar #us-iphone-toggle{width:42px!important;min-width:42px!important;height:46px!important}
+  html.us-iphone .shell.us-iphone-open .sidebar #us-iphone-toggle{width:100%!important}
+  html.us-iphone .sidebar .navbtn{min-height:48px!important;height:48px!important}
+  html.us-iphone .main :is(h1,h2,h3,h4,p,span,label,strong){max-width:100%;overflow-wrap:break-word}
+  html.us-iphone .main h1{font-size:clamp(23px,7vw,30px)!important;line-height:1.16!important}
+  html.us-iphone .main h2{font-size:clamp(19px,5.7vw,24px)!important;line-height:1.2!important}
+  html.us-iphone .main h3{font-size:clamp(17px,5vw,20px)!important;line-height:1.25!important}
+  html.us-iphone .main :is(.top,.top-actions,.panelhead,.row,.controls){min-width:0!important}
+  html.us-iphone .main :is(.panel,.card,.stat,.matchcard,.editorcard){width:100%!important;min-width:0!important;max-width:100%!important}
+  html.us-iphone .main :is(.panel,.card,.matchcard,.editorcard){padding:clamp(12px,3.5vw,18px)!important;border-radius:15px!important}
+  html.us-iphone .main .stats{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+  html.us-iphone .main .stat{padding:12px 10px!important}
+  html.us-iphone .main .top-actions{flex-wrap:wrap!important;overflow-x:visible!important;gap:8px!important}
+  html.us-iphone .main .top-actions>*{max-width:100%!important;min-width:0!important}
+  html.us-iphone .main :is(.cols2,.cols3,.cols4,.split,.roster-grid,.editorright,.arc-grid,.storycards,.v181-settings-grid,.v18-edit-grid,.v18-cast-grid,.us29-workspace){
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important
+  }
+  html.us-iphone .main :is(.cols2,.cols3,.cols4,.split,.roster-grid,.editorright,.arc-grid,.storycards)>*{min-width:0!important;max-width:100%!important}
+  html.us-iphone .main :is(button,.btn,[role="button"]){min-height:44px!important;max-width:100%;white-space:normal}
+  html.us-iphone .main :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),select,textarea){
+    display:block;min-width:0!important;width:100%;max-width:100%!important;
+    min-height:44px;font-size:16px!important;line-height:1.35!important;border-radius:10px
+  }
+  html.us-iphone .main textarea{min-height:100px!important}
+  html.us-iphone :is(.modal,.v10-modal,.v18-dialog,.v10-wizard,.v17-dialog,#modalContent.modal){
+    width:calc(100vw - 16px)!important;min-width:0!important;max-width:calc(100vw - 16px)!important;
+    max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 20px)!important;
+    overflow-y:auto!important;overflow-x:hidden!important;border-radius:16px!important
+  }
+  html.us-iphone :is(.modal,.v10-modal,.v18-dialog,.v10-wizard,.v17-dialog,#modalContent.modal) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),select,textarea){
+    min-width:0!important;max-width:100%!important;font-size:16px!important
+  }
+  html.us-iphone :is(.modal,.v10-modal,.v18-dialog,.v10-wizard,.v17-dialog,#modalContent.modal) :is(.cols2,.cols3,.split,.editorright,.v18-edit-grid,.v18-cast-grid){
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important
+  }
+  html.us-iphone :is(.modalback,#modalBack,.v10-wizard-shade,.v18-overlay,.v199-shade){
+    align-items:center!important;padding:calc(10px + env(safe-area-inset-top,0px)) 8px calc(10px + env(safe-area-inset-bottom,0px))!important
+  }
+  html.us-iphone :is(.main,.modal,.v10-modal,.v18-dialog,.v10-wizard,.v17-dialog) :is(table,.table){
+    display:block!important;max-width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch
+  }
+  html.us-iphone :is(.main,.modal,.v10-modal,.v18-dialog) :is(.tabs,.tabbar,.segmented,.filterrow,.v10-steps,.us27-ple-tabs,[data-us24-settings-tabs],.c-hq-tabs){
+    max-width:100%!important;overflow-x:auto!important;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch
+  }
+  html.us-iphone :is(.main,.modal,.v10-modal,.v18-dialog) :is(.tabs,.tabbar,.segmented,.filterrow,.v10-steps,.us27-ple-tabs,[data-us24-settings-tabs],.c-hq-tabs)>*{
+    scroll-snap-align:start;flex-shrink:0
+  }
+  html.us-iphone #us23-home{
+    left:54px!important;right:0!important;width:auto!important;
+    padding:calc(16px + env(safe-area-inset-top,0px)) 14px calc(35px + env(safe-area-inset-bottom,0px))!important
+  }
+  html.us-iphone .shell.us-iphone-open~#us23-home{left:min(76vw,280px)!important;right:auto!important;width:calc(100vw - 54px)!important}
+  html.us-iphone #us23-home .us23-home-choices{grid-template-columns:minmax(0,1fr)!important}
+  html.us-iphone .v21-onair-tray{max-width:calc(100vw - 54px)!important}
+  html.us-iphone :is(.calendar,.calendar-grid,.monthgrid){max-width:100%!important}
+  html.us-iphone :is(.calendar,.calendar-grid,.monthgrid) button{min-width:0!important}
+}
+@media (max-width: 380px) and (pointer: coarse){
+  html.us-iphone .main .stats{grid-template-columns:minmax(0,1fr)!important}
+  html.us-iphone .shell .main{padding-left:9px!important;padding-right:9px!important}
+}
