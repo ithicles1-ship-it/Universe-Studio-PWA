@@ -7278,7 +7278,12 @@ async function newUniverse(){if(!homeState.exportsReady)return;if(!confirm('Have
   fresh.shows={};fresh.events=[];fresh.records=[];fresh.titleHistory=[];fresh.stories=[];fresh.legacyRivalries=[];fresh.journals=[];fresh.v202Creative={version:1,approvals:[],factionStates:{},news:[],awards:[],hall:[],aiDrafts:[]};
   fresh.powerRankings={};fresh.rankManualOrder={};fresh.history=[];fresh.decisionHistory=[];fresh.currentUniverseDate=fresh.calendarBase||BASE_DAY;
   for(const b of BRANDS){fresh.rosters[b]=[];if(fresh.teams)fresh.teams[b]={};if(fresh.factions)fresh.factions[b]={};for(const t of Object.keys(fresh.champions?.[b]||{}))fresh.champions[b][t]='Vacant';for(const t of Object.keys(fresh.championshipDivisions?.[b]||{})){const d=fresh.championshipDivisions[b][t];if(d&&typeof d==='object'){d.members=[];d.ranking=[];}}}
-  fresh.cleanStarter=true;fresh.legacyReigns={};fresh.historicalTeams={};fresh.pleLogos={};
+  const now=new Date();
+        const monday=new Date(now.getFullYear(),now.getMonth(),now.getDate()-((now.getDay()+6)%7));
+        fresh.calendarBase=[monday.getFullYear(),String(monday.getMonth()+1).padStart(2,'0'),String(monday.getDate()).padStart(2,'0')].join('-');
+        fresh.currentUniverseDate=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-');
+        fresh.baseNumbers={KXT:1,BCW:1,KCW:1};
+        fresh.cleanStarter=true;fresh.legacyReigns={};fresh.historicalTeams={};fresh.pleLogos={};
   for(const k of ['reviewFlags','turnHistory','statusHistory','draftHistory','relationships','v7Decisions','v7Notifications','ledgerImportConflicts','v8ReignSeen','v8ReviewFlags','v9DecisionHistory','v9Checkpoints','foundrySuggestions','foundryReviews','v15ShowHistory'])fresh[k]=[];
   for(const k of ['v7LibrarySources','v9Spotlights','availabilityDetails','wear','statuses'])fresh[k]={};
   fresh.draftWeek={start:fresh.calendarBase,active:false};fresh.v8ReignBaseline=fresh.calendarBase;
