@@ -286,3 +286,89 @@ html.us-iphone .v21-onair-tray.is-open{transform:translate(0,0)!important}
   display:flex!important;align-items:center!important
  }
 }
+
+
+/* v21.5 — Compact iPhone UI, especially booking sheet. No desktop changes. */
+@media (max-width:860px) and (pointer:coarse) {
+ html.us-iphone{--us-mobile-gap:7px!important;font-size:13px!important}
+ html.us-iphone body{font-size:13px!important;line-height:1.35!important}
+ html.us-iphone .shell .main{padding:10px 9px calc(70px + env(safe-area-inset-bottom,0px))!important}
+ html.us-iphone .main h1{font-size:21px!important;line-height:1.15!important}
+ html.us-iphone .main h2{font-size:17px!important;line-height:1.2!important}
+ html.us-iphone .main h3{font-size:15px!important;line-height:1.22!important}
+ html.us-iphone .main :is(.panel,.card,.matchcard,.editorcard,.stat){padding:9px!important;border-radius:10px!important}
+ html.us-iphone .main :is(.cols2,.cols3,.cols4,.split,.roster-grid,.editorright,.arc-grid,.storycards,.v181-settings-grid,.v18-edit-grid,.v18-cast-grid,.us29-workspace){gap:8px!important}
+ html.us-iphone .main :is(.top,.panelhead,.buttonrow,.top-actions){gap:6px!important;margin-bottom:7px!important}
+ html.us-iphone .main :is(button,.btn,[role=button]){min-height:34px!important;padding:6px 8px!important;font-size:12px!important;line-height:1.25!important}
+ html.us-iphone :is(select,input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea){font-size:16px!important;line-height:1.25!important}
+ html.us-iphone .main :is(select,input:not([type=checkbox]):not([type=radio]):not([type=range])){min-height:36px!important;padding:6px 8px!important}
+ html.us-iphone .main textarea{min-height:64px!important;padding:7px!important}
+ html.us-iphone .main .stats{gap:6px!important}
+ html.us-iphone .main .stat .svalue{font-size:18px!important}
+ html.us-iphone .shell .sidebar{gap:6px!important;padding:7px 4px calc(10px + env(safe-area-inset-bottom,0px))!important}
+ html.us-iphone .sidebar .sidegroup{gap:2px!important}
+ html.us-iphone .sidebar .navbtn{height:39px!important;min-height:39px!important;padding:5px!important;border-radius:8px!important}
+ html.us-iphone .sidebar #us-iphone-toggle{height:38px!important;min-height:38px!important}
+ html.us-iphone .shell.us-iphone-open #nav .navbtn{min-height:39px!important;padding:6px 7px!important;gap:7px!important}
+ html.us-iphone .shell.us-iphone-open #nav .navbtn .v10-nav-text{font-size:12px!important}
+ html.us-iphone #us23-home{gap:10px!important;padding:calc(12px + env(safe-area-inset-top,0px)) 9px calc(22px + env(safe-area-inset-bottom,0px))!important}
+ html.us-iphone #us23-home h1{font-size:25px!important}
+ html.us-iphone #us23-home .us23-home-choices{gap:8px!important}
+ html.us-iphone #us23-home .us23-home-choice{min-height:82px!important;padding:11px!important;gap:5px!important}
+ html.us-iphone #us23-home .us23-home-choice strong{font-size:15px!important}
+ html.us-iphone #us23-home .us23-home-choice small{font-size:12px!important;line-height:1.25!important}
+ /* Booking sheet: cancel desktop zoom, keep header/actions inside the screen. */
+ html.us-iphone #modalBack,
+ html.us-iphone #modalBack:has(>.us23-floating-close){zoom:1!important;padding:calc(6px + env(safe-area-inset-top,0px)) 5px calc(6px + env(safe-area-inset-bottom,0px))!important}
+ html.us-iphone #modalContent.modal,
+ html.us-iphone #modalBack:has(>.us23-floating-close) #modalContent.modal{
+  zoom:1!important;transform:none!important;
+  width:calc(100vw - 10px)!important;min-width:0!important;max-width:calc(100vw - 10px)!important;
+  height:auto!important;min-height:0!important;
+  max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 12px)!important;
+  overflow-y:auto!important;overflow-x:hidden!important;border-radius:11px!important
+ }
+ html.us-iphone #modalContent .modalhead{
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  gap:5px!important;padding:8px 10px!important;position:sticky!important;top:0!important;
+  z-index:3!important;background:#171c25!important
+ }
+ html.us-iphone #modalContent .modalhead .v5-showbrand{gap:7px!important;align-items:center!important}
+ html.us-iphone #modalContent .modalhead .v5-showbrand .v4-brandmark{height:30px!important;width:43px!important}
+ html.us-iphone #modalContent .modalhead .v5-showbrand h2{font-size:16px!important;line-height:1.15!important}
+ html.us-iphone #modalContent .modalhead .eyebrow{font-size:8px!important}
+ html.us-iphone #modalContent .modalhead>.buttonrow{display:flex!important;justify-content:flex-start!important;flex-wrap:wrap!important;gap:4px!important}
+ html.us-iphone #modalContent .modalhead button{min-height:31px!important;padding:5px 7px!important;font-size:11px!important;white-space:normal!important}
+ html.us-iphone #modalContent .modalbody{padding:9px!important;overflow-x:hidden!important;min-width:0!important}
+ html.us-iphone #modalContent .v5-sheetintro{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:6px!important;margin:0 0 10px!important}
+ html.us-iphone #modalContent .v5-sheetintro .buttonrow{display:flex!important;flex-wrap:wrap!important;gap:5px!important}
+ html.us-iphone #modalContent .v5-cardgrid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+ html.us-iphone #modalContent .v5-matchcard{padding:10px!important;border-radius:10px!important;min-width:0!important}
+ html.us-iphone #modalContent .v5-match-meta{margin-bottom:6px!important;gap:5px!important;flex-wrap:wrap!important}
+ html.us-iphone #modalContent .v5-m-label{font-size:9px!important;letter-spacing:.6px!important}
+ html.us-iphone #modalContent .v5-card-actions{gap:4px!important}
+ html.us-iphone #modalContent .v5-roundbtn{min-height:30px!important;min-width:30px!important;padding:4px!important}
+ html.us-iphone #modalContent :is(.v5-matchcard,.v5-sheetintro,.modalbody) :is(p,.tiny,small){font-size:11px!important;line-height:1.35!important}
+ html.us-iphone #modalContent :is(button,.btn){min-height:32px!important;padding:5px 7px!important;font-size:11px!important}
+ /* All floating editors/settings dialogs get a compact height and internal scroll. */
+ html.us-iphone :is(.v10-wizard-shade,.v18-overlay,.v199-shade,.modalback){padding:calc(6px + env(safe-area-inset-top,0px)) 5px calc(6px + env(safe-area-inset-bottom,0px))!important}
+ html.us-iphone :is(.v10-wizard-window,.v12b-window,.v18-dialog,.v17-dialog,.v10-modal){
+  width:calc(100vw - 10px)!important;min-width:0!important;max-width:calc(100vw - 10px)!important;
+  height:auto!important;max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 12px)!important;
+  overflow-x:hidden!important;overflow-y:auto!important;border-radius:11px!important
+ }
+ html.us-iphone :is(.v12b-header,.v10-wizard-header,.v18-dialog-header){padding:8px 9px!important;gap:6px!important}
+ html.us-iphone :is(.v12b-header,.v10-wizard-header,.v18-dialog-header) h2{font-size:16px!important}
+ html.us-iphone :is(.v12b-match-tabs,.v10-steps){justify-content:flex-start!important;padding:5px!important;gap:4px!important;overflow-x:auto!important}
+ html.us-iphone :is(.v12b-match-tabs,.v10-steps) button{min-height:30px!important;min-width:30px!important;padding:4px 6px!important;font-size:11px!important}
+ html.us-iphone :is(.v10-wizard-window,.v12b-window,.v18-dialog,.v17-dialog) :is(button,.btn){min-height:33px!important;padding:5px 7px!important;font-size:11px!important;white-space:normal!important}
+ html.us-iphone :is(.v10-wizard-window,.v12b-window,.v18-dialog,.v17-dialog) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea){min-height:35px!important;padding:6px 7px!important;font-size:16px!important}
+ html.us-iphone :is(.v10-wizard-window,.v12b-window,.v18-dialog,.v17-dialog) textarea{min-height:70px!important}
+ /* Keep the weekly vertical agenda readable rather than shrinking it. */
+ html.us-iphone .main .cal-scroll>.calendar>.day{padding:9px!important;min-height:58px!important;gap:5px!important}
+ html.us-iphone .main .cal-scroll>.calendar>.day .event{min-height:34px!important;padding:7px!important;font-size:12px!important}
+ html.us-iphone .us-mobile-weeks{gap:4px!important;margin:7px 0 9px!important}
+ html.us-iphone .us-mobile-week-button{min-height:46px!important;padding:5px 2px!important}
+ html.us-iphone .us-mobile-week-button strong{font-size:11px!important}
+ html.us-iphone .us-mobile-week-button small{font-size:9px!important}
+}
