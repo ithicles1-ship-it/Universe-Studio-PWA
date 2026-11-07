@@ -21,7 +21,19 @@ jobs:
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
           if 'iphone-v21.1.css' in s and 'cleanStarter=true' in s:
-              print('v21.1 already applied')
+              marker='fresh.cleanStarter=true;fresh.legacyReigns={};'
+              if 'fresh.baseNumbers={KXT:1,BCW:1,KCW:1};' not in s:
+                  new='''const now=new Date();
+                  const monday=new Date(now.getFullYear(),now.getMonth(),now.getDate()-((now.getDay()+6)%7));
+                  fresh.calendarBase=[monday.getFullYear(),String(monday.getMonth()+1).padStart(2,'0'),String(monday.getDate()).padStart(2,'0')].join('-');
+                  fresh.currentUniverseDate=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-');
+                  fresh.baseNumbers={KXT:1,BCW:1,KCW:1};
+                  '''
+                  if s.count(marker)!=1:raise RuntimeError('Clean starter reset marker missing')
+                  s=s.replace(marker,new+marker,1)
+                  p.write_text(s,encoding='utf-8')
+                  print('New universes now start at Show 1 in the current week')
+              else: print('Clean starter date and numbering already correct')
               raise SystemExit(0)
           if not s.startswith('<!DOCTYPE html>') or 'async function newUniverse(){' not in s: raise RuntimeError('Unexpected source')
           def patch(old,new):
