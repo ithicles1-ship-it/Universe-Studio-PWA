@@ -46,3 +46,86 @@
  const watch=new MutationObserver(()=>{if(active()&&!document.getElementById('us-iphone-toggle'))mount()});
  watch.observe(document.body,{childList:true,subtree:false});
 })();
+
+/* v21.3: Replace only the iPhone calendar presentation; keep original event nodes
+   and their existing delegated data-action handlers. No Universe data writes. */
+(function(){
+ 'use strict';
+ const small=window.matchMedia('(max-width:860px) and (pointer:coarse)');
+ const names=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+ let selected=0,scheduled=false;
+ function formatDate(iso,options){
+  const d=new Date(iso+'T12:00:00Z');
+  return d.toLocaleDateString('en-GB',Object.assign({timeZone:'UTC'},options));
+ }
+ function applyWeek(cal){
+  const days=Array.from(cal.children).filter(el=>el.classList.contains('day'));
+  if(days.length!==28)return;
+  selected=Math.max(0,Math.min(3,selected));
+  days.forEach((day,index)=>{
+   const show=Math.floor(index/7)===selected;
+   day.classList.toggle('us-week-visible',show);
+   if(show)day.removeAttribute('aria-hidden');else day.setAttribute('aria-hidden','true');
+   if(!day.querySelector('.us-week-dayname')){
+    const iso=day.getAttribute('data-day');
+    if(iso){
+     const heading=document.createElement('span');
+     heading.className='us-week-dayname';
+     const date=new Date(iso+'T12:00:00Z');
+     heading.textContent=names[date.getUTCDay()]+' · '+formatDate(iso,{day:'numeric',month:'short'});
+     const num=day.querySelector('.dnum');
+     if(num){num.textContent='';num.append(heading);}
+    }
+   }
+  });
+  const bar=cal.parentElement?.querySelector('.us-mobile-weeks');
+  bar?.querySelectorAll('.us-mobile-week-button').forEach((btn,index)=>{
+   btn.setAttribute('aria-selected',String(index===selected));
+   btn.tabIndex=index===selected?0:-1;
+  });
+ }
+ function mountCalendar(){
+  if(!small.matches)return;
+  document.querySelectorAll('.cal-scroll > .calendar:not(.us-mobile-week-calendar)').forEach(cal=>{
+   const days=Array.from(cal.children).filter(el=>el.classList.contains('day'));
+   if(days.length!==28)return;
+   cal.classList.add('us-mobile-week-calendar');
+   const bar=document.createElement('div');
+   bar.className='us-mobile-weeks';
+   bar.setAttribute('role','tablist');
+   bar.setAttribute('aria-label','Choose one of the four calendar weeks');
+   const first=days[0].getAttribute('data-day');
+   const current=new Date().toISOString().slice(0,10);
+   if(first&&current>=first&&current<=days[27].getAttribute('data-day')){
+    selected=days.findIndex(day=>day.getAttribute('data-day')===current);
+    selected=Math.max(0,Math.floor(selected/7));
+   }
+   for(let i=0;i<4;i++){
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='us-mobile-week-button';
+    btn.setAttribute('role','tab');
+    btn.innerHTML='<strong>Week '+(i+1)+'</strong><small></small>';
+    const start=days[i*7]?.getAttribute('data-day');
+    const end=days[i*7+6]?.getAttribute('data-day');
+    if(start&&end)btn.querySelector('small').textContent=formatDate(start,{day:'numeric',month:'short'})+'–'+formatDate(end,{day:'numeric',month:'short'});
+    btn.addEventListener('click',()=>{
+     selected=i;applyWeek(cal);
+     cal.scrollIntoView({block:'nearest',behavior:'auto'});
+    });
+    bar.append(btn);
+   }
+   cal.parentElement.insertBefore(bar,cal);
+   applyWeek(cal);
+  });
+ }
+ function queue(){if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;mountCalendar();});}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',queue,{once:true});else queue();
+ const observer=new MutationObserver(mutations=>{
+  if(!small.matches)return;
+  if(mutations.some(m=>Array.from(m.addedNodes).some(n=>n.nodeType===1&&(n.matches?.('.calendar,.cal-scroll')||n.querySelector?.('.cal-scroll > .calendar')))))queue();
+ });
+ const boot=()=>{const main=document.querySelector('.main');if(main)observer.observe(main,{subtree:true,childList:true});queue()};
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+ small.addEventListener?.('change',queue);
+})();
