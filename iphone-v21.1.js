@@ -26,6 +26,8 @@
   if(!btn){
    btn=document.createElement('button');btn.id='us-iphone-toggle';btn.className='ghost';btn.type='button';btn.setAttribute('aria-controls','nav');sidebar.prepend(btn);
   }
+  // On iPhone the hamburger floats independently; the closed drawer occupies no width.
+  if(btn.parentElement!==document.body)document.body.appendChild(btn);
   if(!wired){
    // Keep the content out of the keyboard/menu focus path while the tray is expanded.
    document.addEventListener('click',e=>{if(active()&&e.target.closest('.main')&&document.querySelector('.shell.us-iphone-open'))setOpen(false)});
@@ -38,7 +40,7 @@
  }
  function update(){
   root.classList.toggle('us-iphone',active());
-  if(active())mount();else {document.querySelector('.shell')?.classList.remove('us-iphone-open');document.body.classList.remove('us-iphone-tray-open')}
+  if(active())mount();else {document.querySelector('.shell')?.classList.remove('us-iphone-open');document.body.classList.remove('us-iphone-tray-open');const btn=document.getElementById('us-iphone-toggle');const sidebar=document.querySelector('.sidebar');if(btn&&sidebar)sidebar.prepend(btn)}
  }
  update();
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',update,{once:true});
