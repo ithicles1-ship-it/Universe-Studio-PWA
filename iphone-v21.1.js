@@ -129,3 +129,34 @@
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
  small.addEventListener?.('change',queue);
 })();
+
+
+/* v21.4: Normalize navigation buttons added by older Universe Studio versions.
+   v12 introduced Power Rankings and Championship Divisions without the
+   .v10-nav-text wrapper; the mobile icon-only rail therefore hid their labels. */
+(function(){
+ 'use strict';
+ const media=window.matchMedia('(max-width:860px) and (pointer:coarse)');
+ function repairNav(){
+  if(!media.matches)return;
+  const nav=document.getElementById('nav');
+  if(!nav)return;
+  nav.querySelectorAll('button.navbtn').forEach(button=>{
+   if(button.querySelector('.v10-nav-text'))return;
+   const textNodes=Array.from(button.childNodes).filter(node=>node.nodeType===Node.TEXT_NODE && node.textContent.trim());
+   if(!textNodes.length)return;
+   const label=document.createElement('span');
+   label.className='v10-nav-text';
+   label.textContent=textNodes.map(node=>node.textContent.trim()).join(' ');
+   textNodes[0].parentNode.insertBefore(label,textNodes[0]);
+   textNodes.forEach(node=>node.remove());
+  });
+ }
+ function boot(){
+  repairNav();
+  const nav=document.getElementById('nav');
+  if(nav)new MutationObserver(repairNav).observe(nav,{childList:true,subtree:false});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+ media.addEventListener?.('change',repairNav);
+})();
